@@ -1,0 +1,42 @@
+/* theme-switcher.css */
+
+.theme-switcher button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    color: var(--text-color);
+    opacity: 0.7;
+    transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.theme-switcher button:hover {
+    opacity: 1;
+    background-color: var(--button-bg);
+}
+
+.theme-switcher svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Logic to toggle icon visibility based on the html data-theme attribute */
+.theme-switcher .icon-sun {
+    display: none;
+}
+.theme-switcher .icon-moon {
+    display: block;
+}
+
+html[data-theme='dark'] .theme-switcher .icon-sun {
+    display: block;
+}
+html[data-theme='dark'] .theme-switcher .icon-moon {
+    display: none;
+}

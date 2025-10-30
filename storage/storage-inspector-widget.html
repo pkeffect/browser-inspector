@@ -1,0 +1,114 @@
+<!-- storage/storage-inspector-widget.html -->
+<div class="card storage-card">
+    <div class="storage-header">
+        <h2 id="storage-title">Local Storage</h2>
+        <div class="header-buttons">
+            <div class="profile-controls">
+                <select id="profiles-dropdown" class="storage-button" title="Load a saved profile"></select>
+                <button id="save-profile-btn" class="storage-button icon-button" title="Save Current Storage as Profile">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                </button>
+                <button id="manage-profiles-btn" class="storage-button icon-button" title="Manage Profiles">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </button>
+            </div>
+            <select id="storage-type-select" class="storage-button" title="Select storage type">
+                <option value="localStorage">Local Storage</option>
+                <option value="sessionStorage">Session Storage</option>
+                <option value="indexedDB">IndexedDB</option>
+            </select>
+            <div id="settings-container" class="settings-container">
+                <button id="settings-btn" class="storage-button icon-button" title="Toggle Column Visibility">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+                <div id="settings-dropdown" class="settings-dropdown">
+                    <label><input type="checkbox" data-column="type"> Type</label>
+                    <label><input type="checkbox" data-column="key"> Key</label>
+                    <label><input type="checkbox" data-column="value"> Value</label>
+                    <label><input type="checkbox" data-column="actions"> Actions</label>
+                </div>
+            </div>
+            <button id="import-btn" class="storage-button">Import</button>
+            <input type="file" id="import-file-input" style="display: none;" accept=".json">
+            <button id="export-btn" class="storage-button">Export</button>
+            <button id="refresh-storage-btn" class="storage-button">Refresh</button>
+            <button id="clear-all-btn" class="storage-button clear-all">Clear All</button>
+        </div>
+    </div>
+    <div class="storage-stats">
+        <span id="storage-item-count">0 items</span>
+        <div class="usage-bar"><div id="usage-bar-fill" class="usage-bar-fill"></div></div>
+        <span id="storage-usage">0 KB / 10240 KB</span>
+    </div>
+    <div class="storage-controls">
+        <input type="search" id="storage-search-input" placeholder="Filter by key...">
+        <!-- MODIFIED: Added container for IndexedDB specific controls -->
+        <div id="idb-controls" style="display: none; margin-top: 10px; display: flex; gap: 10px;">
+            <select id="idb-database-select" class="storage-button" style="flex: 1;" title="Select IndexedDB Database"></select>
+            <select id="idb-objectstore-select" class="storage-button" style="flex: 1;" title="Select Object Store"></select>
+        </div>
+    </div>
+    <div class="storage-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-type"><div class="sortable-header" data-sort="type">Type <span class="sort-indicator"></span></div></th>
+                    <th class="col-key"><div class="sortable-header" data-sort="key">Key <span class="sort-indicator"></span></div></th>
+                    <th class="col-value"><div class="sortable-header" data-sort="value">Value <span class="sort-indicator"></span></div></th>
+                    <th class="col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="storage-tbody"></tbody>
+        </table>
+    </div>
+    <!-- ... rest of the file is unchanged ... -->
+    <div class="storage-actions">
+        <div class="add-item-form">
+            <select id="add-type-select" aria-label="Select value type">
+                <option value="string">String</option>
+                <option value="number">Number</option>
+                <option value="boolean">Boolean</option>
+            </select>
+            <input type="text" id="add-key-input" placeholder="New Key" aria-label="New Key">
+            <div id="add-value-container">
+                <input type="text" id="add-value-input" placeholder="New Value" aria-label="New Value">
+                <select id="add-value-boolean-select" class="edit-input" style="display: none;" aria-label="New Boolean Value">
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </div>
+            <button id="add-item-btn" title="Add Item" aria-label="Add Item">+</button>
+        </div>
+    </div>
+    <div id="json-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Value</h2>
+                <button id="modal-close-btn" class="modal-close" title="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="json-edit-area"></textarea>
+            </div>
+            <div class="modal-footer" id="json-modal-footer">
+                <button id="compare-versions-btn" class="storage-button">Compare Versions</button>
+                <button id="modal-save-btn" class="storage-button">Save</button>
+            </div>
+        </div>
+    </div>
+    <div id="profiles-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h2 class="modal-title">Manage Profiles</h2>
+                <button id="profiles-modal-close-btn" class="modal-close" title="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul id="profiles-list"></ul>
+            </div>
+        </div>
+    </div>
+    <div id="storage-tooltip" class="storage-tooltip"></div>
+</div>

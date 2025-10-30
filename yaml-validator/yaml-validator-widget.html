@@ -1,0 +1,22 @@
+<!-- yaml-validator/yaml-validator-widget.html -->
+<div class="card validator-card">
+    <h1>YAML Validator & Formatter</h1>
+    <p class="description">Paste in your YAML to validate, format, or minify it.</p>
+    
+    <div class="editor-wrapper">
+        <div class="editor-container">
+            <div id="yaml-line-numbers" class="line-numbers">1</div>
+            <textarea id="yaml-text-input" spellcheck="false" placeholder="key: value"></textarea>
+        </div>
+        <button id="yaml-copy-btn" title="Copy to clipboard">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+        </button>
+    </div>
+
+    <div class="controls">
+        <button id="yaml-validate-btn" class="storage-button">Validate & Format</button>
+        <button id="yaml-clear-btn" class="storage-button">Clear</button>
+        <button id="yaml-minify-btn" class="storage-button">Minify (Flow Style)</button>
+    </div>
+    <pre id="yaml-result"></pre>
+</div>

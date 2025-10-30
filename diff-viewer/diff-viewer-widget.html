@@ -1,0 +1,58 @@
+<!-- diff-viewer/diff-viewer-widget.html -->
+<div class="card diff-card">
+    <!-- CORRECTED: Header with Title and All Buttons -->
+    <div class="diff-header">
+        <h2 id="diff-viewer-title">Version Comparison</h2>
+        <div class="header-buttons">
+            <button id="close-diff-viewer-btn" class="storage-button">Close</button>
+        </div>
+    </div>
+
+    <!-- Subheader for Key and Revision Dropdown -->
+    <div class="diff-subheader">
+        <span class="revision-label" id="diff-key-label">Comparing Key:</span>
+        <div class="revision-controls">
+            <span class="revision-label">Compare Against:</span>
+            <select id="revisions-dropdown" class="storage-button"></select>
+        </div>
+    </div>
+
+    <!-- CORRECTED: Options Bar with All Controls -->
+    <div class="options-bar">
+        <div class="options-group">
+            <select id="font-select" class="storage-button" title="Editor Font"></select>
+            <select id="font-size-select" class="storage-button" title="Font Size"></select>
+            <label><input type="checkbox" id="wrap-lines-check"> Wrap</label>
+        </div>
+        <div class="search-group">
+            <input type="search" id="search-input" placeholder="Search...">
+            <button id="search-btn" class="storage-button">Find</button>
+        </div>
+    </div>
+
+    <!-- Panes -->
+    <div class="diff-panes-container">
+        <div class="diff-pane" id="diff-pane-a">
+            <div class="scroll-sizer" id="sizer-a"></div>
+            <div class="table-container">
+                <table class="code-table">
+                    <tbody id="code-body-a"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="diff-pane" id="diff-pane-b">
+            <div class="scroll-sizer" id="sizer-b"></div>
+            <div class="table-container">
+                <table class="code-table">
+                    <tbody id="code-body-b"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar and Tooltip -->
+    <div class="status-bar">
+        <span id="diff-stats-label"></span>
+    </div>
+    <div id="diff-tooltip" class="storage-tooltip"></div>
+</div>
