@@ -1,0 +1,17 @@
+storage-inspector/
+├── css/
+│   ├── main.css
+│   ├── storage-inspector.css
+│   └── theme-switcher.css
+├── js/
+│   ├── app.js
+│   ├── storage-inspector-api.js
+│   ├── storage-inspector-bookmarklet.js
+│   ├── storage-inspector-main.js
+│   ├── storage-inspector-profiles.js
+│   ├── storage-inspector-revisions.js
+│   ├── storage-inspector-ui.js
+│   ├── theme-switcher.js
+│   └── utils.js
+├── index.html
+└── storage-inspector-widget.html

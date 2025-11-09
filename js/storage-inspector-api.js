@@ -1,4 +1,5 @@
-// storage-api.js
+// VERSION: 0.1.2
+// storage-inspector-api.js
 
 const PREFIX_DELIMITER = /[:./]/;
 

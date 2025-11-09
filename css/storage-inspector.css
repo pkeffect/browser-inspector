@@ -1,3 +1,4 @@
+/* VERSION: 0.1.1 */
 /* storage-inspector.css */
 
 :root {
@@ -10,12 +11,32 @@
     --success-color: #38a169;
 }
 
-.storage-card { max-width: 1200px; width: 100%; padding: 15px; position: relative; } /* Adjusted max-width */
-.storage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.storage-card { max-width: 1200px; width: 100%; padding: 15px; position: relative; }
+.storage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 15px; }
+
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .storage-header h2 { margin: 0; font-size: 1.2em; font-weight: 600; }
+
+.domain-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75em;
+    font-weight: 500;
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
 .header-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; }
 
-/* ... (rest of the file is complete and unchanged from the previous correct version) ... */
 .storage-stats { display: flex; align-items: center; gap: 10px; font-size: 0.8em; opacity: 0.8; margin-bottom: 15px; }
 .usage-bar { flex-grow: 1; height: 8px; background-color: var(--button-bg); border-radius: 4px; overflow: hidden; }
 .usage-bar-fill { height: 100%; width: 0%; background-color: var(--selected-bg); border-radius: 4px; transition: width 0.3s ease-in-out; }
@@ -117,8 +138,8 @@
     background-position: right 0.5rem center;
     background-size: 16px 12px;
 }
-html.dark #profiles-dropdown,
-html.dark #storage-type-select {
+html[data-theme='dark'] #profiles-dropdown,
+html[data-theme='dark'] #storage-type-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ced4da' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
 }
 

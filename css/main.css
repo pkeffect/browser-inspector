@@ -34,48 +34,7 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* --- HEADER --- */
-.app-header {
-    width: 100%;
-    background-color: var(--card-bg);
-    border-bottom: 1px solid var(--border-color);
-    padding: 0 20px;
-    box-sizing: border-box;
-    flex-shrink: 0;
-    transition: background-color 0.3s, border-color 0.3s;
-}
 
-.app-header nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.nav-link {
-    padding: 15px 10px;
-    text-decoration: none;
-    color: var(--text-color);
-    opacity: 0.7;
-    font-size: 0.9em;
-    border-bottom: 2px solid transparent;
-    transition: opacity 0.2s, border-color 0.2s, color 0.3s;
-}
-.nav-link:hover {
-    opacity: 1;
-}
-.nav-link.active {
-    opacity: 1;
-    font-weight: 500;
-    border-bottom-color: var(--selected-bg);
-}
 
 /* --- MAIN CONTENT AREA --- */
 .app-main {

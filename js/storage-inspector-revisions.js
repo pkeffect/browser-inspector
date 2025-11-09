@@ -1,4 +1,5 @@
-// storage/storage-revisions.js
+// VERSION: 0.1.2
+// storage-inspector-revisions.js
 
 const REVISION_PREFIX = '_rev:';
 const MAX_REVISIONS = 10; // Maximum number of revisions to keep per key

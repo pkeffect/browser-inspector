@@ -1,4 +1,5 @@
-// storage-profiles.js
+// VERSION: 0.1.2
+// storage-inspector-profiles.js
 
 const PROFILES_STORAGE_KEY = 'storageInspector_profiles';
 

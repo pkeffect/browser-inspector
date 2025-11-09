@@ -3,49 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevTool Suite</title>
+    <title>Storage Inspector</title>
     <!-- Styles -->
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="theme-switcher.css">
-    <link rel="stylesheet" href="storage/storage-inspector.css">
-    <link rel="stylesheet" href="diff-viewer/diff-viewer.css">
-    <link rel="stylesheet" href="json-validator/json-validator.css">
-    <link rel="stylesheet" href="yaml-validator/yaml-validator.css">
-    <link rel="stylesheet" href="diff-viewer/monokai.min.css">
-
-    <!-- Libraries -->
-    <script src="diff-viewer/diff.min.js"></script>
-    <script src="diff-viewer/highlight.min.js"></script>
-    <script src="yaml-validator/js-yaml.min.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/storage-inspector.css">
+    <link rel="stylesheet" href="css/theme-switcher.css">
 </head>
 <body>
-    <header class="app-header">
-        <nav id="main-nav">
-            <!-- CORRECTED: The nav-links div now wraps the links AND the switcher -->
-            <div class="nav-links">
-                <a href="#storage-inspector" class="nav-link active">Storage Inspector</a>
-                <a href="#yaml-validator" class="nav-link">YAML Validator</a>
-                <a href="#json-validator" class="nav-link">JSON Validator</a>
-
-                <!-- The switcher is now a flex item within this centered container -->
-                <div class="theme-switcher">
-                    <button id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-                        <svg class="icon-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M9.37 5.51A7.35 7.35 0 0 0 9.1 7.5c0 4.08 3.32 7.4 7.4 7.4.68 0 1.35-.09 1.99-.27C17.45 17.19 14.93 19 12 19c-3.86 0-7-3.14-7-7s3.14-7 7-7c.91 0 1.78.18 2.58.51z"/></svg>
-                        <svg class="icon-sun" viewBox="0 0 24 24"><path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.64 5.64zm12.72 12.72c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zM5.64 18.36l-1.06-1.06c-.39-.39-.39-1.02 0-1.41s1.02-.39 1.41 0l1.06 1.06c.39.39.39 1.02 0 1.41s-1.02-.39-1.41 0zm12.72-12.72l-1.06-1.06c-.39-.39-.39-1.02 0-1.41s1.02-.39 1.41 0l1.06 1.06c.39.39.39 1.02 0 1.41-.39.39-1.02-.39-1.41 0z"/></svg>
-                    </button>
-                </div>
-            </div>
-        </nav>
-    </header>
-
     <main class="app-main">
         <div id="storage-inspector-container" class="widget-container"></div>
-        <div id="yaml-validator-container" class="widget-container" style="display: none;"></div>
-        <div id="json-validator-container" class="widget-container" style="display: none;"></div>
     </main>
-    
-    <div id="diff-viewer-container" class="diff-viewer-overlay" style="display: none;"></div>
 
-    <script src="app.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
 </body>
 </html>

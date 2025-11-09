@@ -1,14 +1,12 @@
-# 🛠️ Browser DevTools
+# 🛠️ Storage Inspector
 
 > Overly extensive development tools for web browser data storage
 
-A comprehensive web-based developer toolkit for inspecting, managing, and validating browser storage with advanced features including version history, diff viewing, and data validation.
+A comprehensive web-based developer toolkit for inspecting, managing, and validating browser storage with advanced features including version history, profiles and diff viewing.
 
 ---
 
 ## ✨ Features
-
-### 🗄️ Storage Inspector
 
 A powerful browser storage management tool supporting **localStorage**, **sessionStorage**, and **IndexedDB**.
 
@@ -47,68 +45,14 @@ A powerful browser storage management tool supporting **localStorage**, **sessio
 
 ---
 
-### 🆚 Diff Viewer
-
-Advanced side-by-side comparison tool for viewing changes between versions.
-
-#### Features
-- 📊 **Side-by-Side Display** - Dual-pane layout with synchronized scrolling
-- 🎨 **Syntax Highlighting** - Powered by highlight.js with Monokai theme
-- 🔍 **Line-by-Line Diff** - Clear visualization of:
-  - Added lines (green)
-  - Deleted lines (red)
-  - Changed lines (yellow)
-  - Character-level changes within lines
-- 📜 **Version Selection** - Compare against any saved revision
-- 🔎 **Search Function** - Find text across both panes
-- ⚙️ **Customization Options**:
-  - Font family selection (Consolas, Courier New, Fira Code, etc.)
-  - Font size adjustment (10px-20px)
-  - Line wrapping toggle
-- 📊 **Statistics** - Shows count of added/deleted lines
-- 🎯 **Virtual Scrolling** - Efficient rendering for large files
-
----
-
-### ✅ JSON Validator & Formatter
-
-Validate, format, and compress JSON data with ease.
-
-#### Features
-- ✔️ **Validation** - Instant JSON syntax checking
-- 🎨 **Formatting** - Pretty-print with 2-space indentation
-- 🗜️ **Compression** - Minify JSON for production
-- 📋 **Copy to Clipboard** - One-click copy functionality
-- 🔢 **Line Numbers** - Editor with synchronized line numbers
-- 🔄 **Scroll Sync** - Line numbers stay in sync with content
-- ❌ **Error Display** - Clear error messages with line information
-
----
-
-### 📝 YAML Validator & Formatter
-
-Validate, format, and minify YAML documents.
-
-#### Features
-- ✔️ **Validation** - Parse and validate YAML syntax
-- 🎨 **Formatting** - Auto-format with proper indentation
-- 🗜️ **Minification** - Convert to flow style for compact output
-- 📋 **Copy to Clipboard** - One-click copy functionality
-- 🔢 **Line Numbers** - Editor with synchronized line numbers
-- 🔄 **Scroll Sync** - Line numbers stay in sync with content
-- ❌ **Error Display** - Detailed error messages
-- 🔄 **YAML ↔ JSON** - Easy conversion between formats
-
----
-
 ## 🚀 Getting Started
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/pkeffect/Browser-DevTools.git
-   cd Browser-DevTools
+   git clone https://github.com/pkeffect/storage-inspector.git
+   cd storage-inspector
    ```
 
 2. **Open in browser**
@@ -119,7 +63,7 @@ Validate, format, and minify YAML documents.
    # Then navigate to http://localhost:8000
    ```
 
-No build process or dependencies required! This is a pure client-side application.
+No build process or dependencies required! This is a pure client-side application. Drop into any http server.
 
 ---
 
@@ -156,14 +100,6 @@ No build process or dependencies required! This is a pure client-side applicatio
 - **Export**: Click "Export" to download current storage as JSON
 - **Import**: Click "Import" and select a JSON file
 
-### JSON/YAML Validators
-
-1. Paste or type your JSON/YAML in the editor
-2. Click "Validate & Format" to check syntax and format
-3. Click "Compress/Minify" to create compact version
-4. Click "Clear" to reset editor
-5. Use copy button to copy content to clipboard
-
 ---
 
 ## 🎨 Theme Support
@@ -182,40 +118,23 @@ The application automatically detects your system theme preference and includes 
 ### File Structure
 
 ```
-Browser-DevTools/
-├── index.html                          # Main HTML file
-├── app.js                              # Application entry point
-├── main.css                            # Global styles
-├── theme-switcher.js/css               # Theme management
-├── utils.js                            # Shared utility functions
-│
-├── storage/                            # Storage Inspector
-│   ├── storage-inspector-widget.html   # Widget HTML
-│   ├── storage-inspector.css           # Widget styles
-│   ├── storage-main.js                 # Main controller
-│   ├── storage-api.js                  # Storage operations API
-│   ├── storage-ui.js                   # UI rendering functions
-│   ├── storage-profiles.js             # Profile management
-│   └── storage-revisions.js            # Version history
-│
-├── diff-viewer/                        # Diff Viewer
-│   ├── diff-viewer-widget.html         # Widget HTML
-│   ├── diff-viewer.css                 # Widget styles
-│   ├── diff-viewer.js                  # Main diff logic
-│   ├── diff.min.js                     # jsdiff library
-│   ├── highlight.min.js                # Syntax highlighting
-│   └── monokai.min.css                 # Code theme
-│
-├── json-validator/                     # JSON Validator
-│   ├── json-validator-widget.html      # Widget HTML
-│   ├── json-validator.css              # Widget styles
-│   └── json-validator.js               # Validation logic
-│
-└── yaml-validator/                     # YAML Validator
-    ├── yaml-validator-widget.html      # Widget HTML
-    ├── yaml-validator.css              # Widget styles
-    ├── yaml-validator.js               # Validation logic
-    └── js-yaml.min.js                  # js-yaml library
+storage-inspector/
+├── css/
+│   ├── main.css
+│   ├── storage-inspector.css
+│   └── theme-switcher.css
+├── js/
+│   ├── app.js
+│   ├── storage-inspector-api.js
+│   ├── storage-inspector-bookmarklet.js
+│   ├── storage-inspector-main.js
+│   ├── storage-inspector-profiles.js
+│   ├── storage-inspector-revisions.js
+│   ├── storage-inspector-ui.js
+│   ├── theme-switcher.js
+│   └── utils.js
+├── index.html
+└── storage-inspector-widget.html
 ```
 
 ### Module System
@@ -242,13 +161,6 @@ The application uses ES6 modules for clean separation of concerns:
 - ✅ Firefox 88+
 - ✅ Safari 14+
 - ⚠️ IndexedDB features may vary by browser
-
-### Dependencies
-
-All dependencies are included via CDN or minified files:
-- **jsdiff** (5.1.0) - Text diffing algorithm
-- **highlight.js** (11.9.0) - Syntax highlighting
-- **js-yaml** (4.1.0) - YAML parsing and dumping
 
 ---
 
@@ -280,6 +192,7 @@ All dependencies are included via CDN or minified files:
 - Revision history only available for localStorage/sessionStorage (not IndexedDB)
 - Very large objects (>1MB) may cause performance issues in diff viewer
 - Some IndexedDB object stores with auto-increment keys may have limited edit capability
+- Check `js/storage-inspector-bookmarklet.js` for using this on any domain as a Bookmarklet
 
 ---
 
@@ -296,7 +209,7 @@ Contributions are welcome! Here's how you can help:
 
 ```bash
 # Clone repository
-git clone https://github.com/pkeffect/Browser-DevTools.git
+git clone https://github.com/pkeffect/storage-inspector.git
 
 # No build step needed! Just open index.html
 # Or run a local server:
@@ -322,15 +235,13 @@ Copyright (c) 2025 pkeffect
 ## 🙏 Acknowledgments
 
 - [jsdiff](https://github.com/kpdecker/jsdiff) - Text diffing by Kevin Decker
-- [highlight.js](https://highlightjs.org/) - Syntax highlighting
-- [js-yaml](https://github.com/nodeca/js-yaml) - YAML parser
 
 ---
 
 ## 📞 Support
 
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/Browser-DevTools/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/Browser-DevTools/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/pkeffect/storage-inspector/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/pkeffect/storage-inspector/discussions)
 
 ---
 

@@ -1,9 +1,10 @@
-// storage/storage-main.js
+// VERSION: 0.1.3
+// storage-inspector-main.js
 
-import * as api from './storage-api.js';
-import * as ui from './storage-ui.js';
-import { init as initProfiles } from './storage-profiles.js';
-import { addRevision } from './storage-revisions.js';
+import * as api from './storage-inspector-api.js';
+import * as ui from './storage-inspector-ui.js';
+import { init as initProfiles } from './storage-inspector-profiles.js';
+import { addRevision } from './storage-inspector-revisions.js';
 
 export function init() {
     const elements = {
@@ -35,13 +36,13 @@ export function init() {
         settingsDropdown: document.getElementById('settings-dropdown'),
         storageTypeSelect: document.getElementById('storage-type-select'),
         storageTitle: document.getElementById('storage-title'),
+        domainDisplay: document.getElementById('domain-display'),
         saveProfileBtn: document.getElementById('save-profile-btn'),
         manageProfilesBtn: document.getElementById('manage-profiles-btn'),
         profilesDropdown: document.getElementById('profiles-dropdown'),
         profilesModal: document.getElementById('profiles-modal'),
         profilesModalCloseBtn: document.getElementById('profiles-modal-close-btn'),
         profilesList: document.getElementById('profiles-list'),
-        // NEW elements for IndexedDB
         idbControls: document.getElementById('idb-controls'),
         idbDatabaseSelect: document.getElementById('idb-database-select'),
         idbObjectStoreSelect: document.getElementById('idb-objectstore-select'),
@@ -142,85 +143,111 @@ export function init() {
                 ui.showTooltip(elements.tooltip, elements.storageCard, "Deleted!", target);
             }
         } else if (target.matches('.copy-btn, .copy-btn *')) {
-            const btn = target.closest('.copy-btn');
-            const textToCopy = `"${btn.dataset.copyKey}": ${btn.dataset.copyValue}`;
-            navigator.clipboard.writeText(textToCopy)
-                .then(() => ui.showTooltip(elements.tooltip, elements.storageCard, "Copied!", btn))
-                .catch(err => ui.showTooltip(elements.tooltip, elements.storageCard, "Copy Failed!", btn, { isWarning: true }));
+            const copyTarget = target.closest('.copy-btn');
+            const copyKey = copyTarget.dataset.copyKey;
+            const copyValue = copyTarget.dataset.copyValue;
+            const text = `"${copyKey}": ${copyValue}`;
+            try {
+                await navigator.clipboard.writeText(text);
+                ui.showTooltip(elements.tooltip, elements.storageCard, "Copied!", copyTarget);
+            } catch (e) {
+                ui.showTooltip(elements.tooltip, elements.storageCard, "Copy failed", copyTarget, { isWarning: true });
+            }
         } else if (target.matches('.view-btn, .view-btn *')) {
             const value = await api.getItem(state.currentStorageType, key, getIdbParams());
-            const type = api.getDataType(value);
+            if (value === null || value === undefined) return;
             state.currentEditingKey = key;
-            if (type === 'object' || type === 'array') {
-                try { elements.jsonEditArea.value = JSON.stringify(JSON.parse(value), null, 2); } 
-                catch (e) { elements.jsonEditArea.value = value; }
-            } else {
-                elements.jsonEditArea.value = value;
-            }
+            elements.jsonEditArea.value = value;
             elements.jsonModal.style.display = 'flex';
-            elements.jsonEditArea.focus();
-        } else if (target.matches('td[data-type]')) {
-            if (target.querySelector('input, select')) return;
+        } else if (target.matches('.key-cell, .value-cell') && target.dataset.type) {
+            if (state.currentEditingKey) return;
             const originalValue = await api.getItem(state.currentStorageType, key, getIdbParams());
-            ui.createEditInputUI(target, key, originalValue, async (newValue) => {
-                if (target.dataset.type === 'key') {
-                    if (newValue && newValue !== key) {
-                        await api.setItem(state.currentStorageType, newValue, originalValue, getIdbParams());
-                        await api.removeItem(state.currentStorageType, key, getIdbParams());
+            if (originalValue === null || originalValue === undefined) return;
+            state.currentEditingKey = key;
+            const isValueCell = target.classList.contains('value-cell');
+            const onSave = async (newVal) => {
+                if (isValueCell && newVal !== originalValue) {
+                    if (state.currentStorageType === 'localStorage' || state.currentStorageType === 'sessionStorage') {
+                        const storage = state.currentStorageType === 'localStorage' ? window.localStorage : window.sessionStorage;
+                        addRevision(storage, key, originalValue);
                     }
-                } else {
-                    if (originalValue !== newValue) {
-                        await api.setItem(state.currentStorageType, key, newValue, getIdbParams());
-                    }
+                    await api.setItem(state.currentStorageType, key, newVal, getIdbParams());
+                    ui.showTooltip(elements.tooltip, elements.storageCard, "Saved!", target);
+                } else if (!isValueCell && newVal && newVal !== key) {
+                    await api.setItem(state.currentStorageType, newVal, originalValue, getIdbParams());
+                    await api.removeItem(state.currentStorageType, key, getIdbParams());
+                    ui.showTooltip(elements.tooltip, elements.storageCard, "Key renamed!", target);
                 }
+                state.currentEditingKey = null;
                 render();
-            }, render);
-        }
-    };
-
-    const handleAddItem = async () => {
-        const key = elements.addKeyInput.value.trim();
-        const type = elements.addTypeSelect.value;
-        let value = (type === 'boolean') ? elements.addValueBooleanSelect.value : elements.addValueInput.value;
-        if (key) {
-            await api.setItem(state.currentStorageType, key, value, getIdbParams());
-            elements.addKeyInput.value = '';
-            elements.addValueInput.value = '';
-            render();
-            elements.addKeyInput.focus();
-            ui.showTooltip(elements.tooltip, elements.storageCard, "Item Added!", elements.addItemBtn);
-        } else {
-            ui.showTooltip(elements.tooltip, elements.storageCard, "Key cannot be empty!", elements.addKeyInput, { isWarning: true });
+            };
+            const onCancel = () => {
+                target.textContent = isValueCell ? originalValue : key;
+                state.currentEditingKey = null;
+            };
+            ui.createEditInputUI(target, key, originalValue, onSave, onCancel);
         }
     };
 
     const handleClearAll = async () => {
-        const storageName = state.currentStorageType === 'indexedDB' ? `the "${state.currentIdbStoreName}" object store` : `${state.currentStorageType}`;
-        if (confirm(`Are you sure you want to delete ALL items from ${storageName}? This cannot be undone.`)) {
+        let storageName = elements.storageTypeSelect.options[elements.storageTypeSelect.selectedIndex].text;
+        if (state.currentStorageType === 'indexedDB' && state.currentIdbStoreName) {
+            storageName = `Object store "${state.currentIdbStoreName}"`;
+        }
+        if (confirm(`Are you sure you want to clear all items from ${storageName}?`)) {
             await api.clear(state.currentStorageType, getIdbParams());
             render();
-            ui.showTooltip(elements.tooltip, elements.storageCard, "Storage Cleared!", elements.clearAllBtn);
+            ui.showTooltip(elements.tooltip, elements.storageCard, "Cleared!", elements.clearAllBtn, { isWarning: true });
         }
     };
 
-    const handleExport = async () => {
-        const { ungrouped, grouped } = await api.getStorageItems(state.currentStorageType, '', { column: 'key', direction: 'asc' }, getIdbParams());
-        const allItems = [...ungrouped, ...Object.values(grouped).flat()];
-        const data = {};
-        allItems.forEach(item => {
-            if (!item.key.startsWith('_rev:')) data[item.key] = item.value;
-        });
-        
-        if (Object.keys(data).length === 0) {
-            ui.showTooltip(elements.tooltip, elements.storageCard, "Storage is empty!", elements.exportBtn, { isWarning: true });
+    const handleAddItem = async () => {
+        let key = elements.addKeyInput.value.trim();
+        const selectedType = elements.addTypeSelect.value;
+        let value = selectedType === 'boolean' 
+                    ? elements.addValueBooleanSelect.value 
+                    : elements.addValueInput.value.trim();
+
+        if (!key || !value) {
+            ui.showTooltip(elements.tooltip, elements.storageCard, "Key and value required!", elements.addItemBtn, { isWarning: true });
             return;
         }
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+
+        const existingValue = await api.getItem(state.currentStorageType, key, getIdbParams());
+        if (existingValue !== null && existingValue !== undefined) {
+            if (!confirm(`Key "${key}" already exists. Overwrite it?`)) return;
+        }
+
+        await api.setItem(state.currentStorageType, key, value, getIdbParams());
+        elements.addKeyInput.value = '';
+        elements.addValueInput.value = '';
+        render();
+        ui.showTooltip(elements.tooltip, elements.storageCard, "Added!", elements.addItemBtn);
+    };
+
+    const handleNewItemTypeChange = () => {
+        const selectedType = elements.addTypeSelect.value;
+        if (selectedType === 'boolean') {
+            elements.addValueInput.style.display = 'none';
+            elements.addValueBooleanSelect.style.display = 'block';
+        } else {
+            elements.addValueInput.style.display = 'block';
+            elements.addValueBooleanSelect.style.display = 'none';
+        }
+    };
+
+    const handleExport = () => {
+        const exportData = {};
+        const storage = state.currentStorageType === 'localStorage' ? window.localStorage : window.sessionStorage;
+        for (let i = 0; i < storage.length; i++) {
+            const key = storage.key(i);
+            exportData[key] = storage.getItem(key);
+        }
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const filename = state.currentStorageType === 'indexedDB' ? `${state.currentIdbDbName}-${state.currentIdbStoreName}` : state.currentStorageType;
-        a.download = `${filename}-backup.json`;
+        a.download = `${state.currentStorageType}_export.json`;
         a.click();
         URL.revokeObjectURL(url);
         ui.showTooltip(elements.tooltip, elements.storageCard, "Exported!", elements.exportBtn);
@@ -233,65 +260,65 @@ export function init() {
         reader.onload = async (e) => {
             try {
                 const data = JSON.parse(e.target.result);
-                if (typeof data !== 'object' || data === null || Array.isArray(data)) { throw new Error("File must be a valid JSON object."); }
-                if (confirm("This will overwrite existing keys. Continue?")) {
-                    for (const key in data) {
-                        await api.setItem(state.currentStorageType, key, String(data[key]), getIdbParams());
-                    }
-                    render();
-                    ui.showTooltip(elements.tooltip, elements.storageCard, "Imported!", elements.importBtn);
-                }
-            } catch (err) {
-                alert(`Error parsing file: ${err.message}`);
-                ui.showTooltip(elements.tooltip, elements.storageCard, "Import Failed!", elements.importBtn, { isWarning: true });
+                const storage = state.currentStorageType === 'localStorage' ? window.localStorage : window.sessionStorage;
+                Object.keys(data).forEach(key => storage.setItem(key, data[key]));
+                render();
+                ui.showTooltip(elements.tooltip, elements.storageCard, "Imported!", elements.importBtn);
+            } catch (error) {
+                alert("Invalid JSON file.");
             }
         };
         reader.readAsText(file);
         event.target.value = '';
     };
 
-    const handleNewItemTypeChange = () => {
-        const selectedType = elements.addTypeSelect.value;
-        elements.addValueInput.style.display = selectedType === 'boolean' ? 'none' : 'block';
-        elements.addValueBooleanSelect.style.display = selectedType === 'boolean' ? 'block' : 'none';
-    };
-
     const handleColumnVisibilityChange = (event) => {
-        const column = event.target.dataset.column;
-        if (column) {
-            state.columnVisibility[column] = event.target.checked;
-            localStorage.setItem(state.COLUMN_VISIBILITY_KEY, JSON.stringify(state.columnVisibility));
+        const col = event.target.dataset.column;
+        if (col && state.columnVisibility[col] !== undefined) {
+            state.columnVisibility[col] = event.target.checked;
             ui.applyColumnVisibilityUI(elements.storageTableContainer, state.columnVisibility);
+            localStorage.setItem(state.COLUMN_VISIBILITY_KEY, JSON.stringify(state.columnVisibility));
         }
     };
-    
+
     async function updateIdbControlsUI() {
         const dbNames = await api.idbGetDatabaseNames();
         elements.idbDatabaseSelect.innerHTML = '<option value="">Select Database...</option>';
-        dbNames.forEach(name => {
-            const option = new Option(name, name);
-            elements.idbDatabaseSelect.add(option);
+        dbNames.forEach(dbName => {
+            const option = document.createElement('option');
+            option.value = dbName;
+            option.textContent = dbName;
+            elements.idbDatabaseSelect.appendChild(option);
         });
+        
         elements.idbObjectStoreSelect.innerHTML = '<option value="">Select Object Store...</option>';
         elements.idbObjectStoreSelect.disabled = true;
+        state.currentIdbDbName = null;
+        state.currentIdbStoreName = null;
     }
 
     const handleIdbDatabaseChange = async () => {
         state.currentIdbDbName = elements.idbDatabaseSelect.value;
-        state.currentIdbStoreName = null;
-        elements.idbObjectStoreSelect.innerHTML = '<option value="">Loading stores...</option>';
-        if (state.currentIdbDbName) {
-            const storeNames = await api.idbGetObjectStoreNames(state.currentIdbDbName);
-            elements.idbObjectStoreSelect.innerHTML = '<option value="">Select Object Store...</option>';
-            storeNames.forEach(name => {
-                const option = new Option(name, name);
-                elements.idbObjectStoreSelect.add(option);
-            });
-            elements.idbObjectStoreSelect.disabled = storeNames.length === 0;
-        } else {
+        if (!state.currentIdbDbName) {
             elements.idbObjectStoreSelect.innerHTML = '<option value="">Select Object Store...</option>';
             elements.idbObjectStoreSelect.disabled = true;
+            state.currentIdbStoreName = null;
+            elements.clearAllBtn.disabled = true;
+            render();
+            return;
         }
+
+        const storeNames = await api.idbGetObjectStoreNames(state.currentIdbDbName);
+        elements.idbObjectStoreSelect.innerHTML = '<option value="">Select Object Store...</option>';
+        storeNames.forEach(storeName => {
+            const option = document.createElement('option');
+            option.value = storeName;
+            option.textContent = storeName;
+            elements.idbObjectStoreSelect.appendChild(option);
+        });
+        elements.idbObjectStoreSelect.disabled = false;
+        state.currentIdbStoreName = null;
+        elements.clearAllBtn.disabled = true;
         render();
     };
 
@@ -320,7 +347,7 @@ export function init() {
         
         elements.idbControls.style.display = isIdb ? 'flex' : 'none';
         elements.importBtn.disabled = isIdb;
-        elements.clearAllBtn.disabled = isIdb; // Disabled until a store is selected
+        elements.clearAllBtn.disabled = isIdb;
 
         if (isIdb) {
             updateIdbControlsUI();
@@ -378,6 +405,12 @@ export function init() {
         document.dispatchEvent(event);
         elements.jsonModal.style.display = 'none';
     };
+    
+    function updateDomainDisplay() {
+        if (elements.domainDisplay) {
+            elements.domainDisplay.textContent = window.location.hostname || 'localhost';
+        }
+    }
 
     function initialize() {
         const savedVisibility = localStorage.getItem(state.COLUMN_VISIBILITY_KEY);
@@ -392,6 +425,7 @@ export function init() {
         ui.applyColumnVisibilityUI(elements.storageTableContainer, state.columnVisibility);
 
         handleNewItemTypeChange();
+        updateDomainDisplay();
         handleStorageTypeChange();
         
         window.addEventListener('storage', handleStorageChange);
@@ -429,8 +463,6 @@ export function init() {
         }, () => state.currentStorageType === 'localStorage' ? window.localStorage : window.sessionStorage, 
            render, 
            (msg, el, opts) => ui.showTooltip(elements.tooltip, elements.storageCard, msg, el, opts));
-
-        render();
     }
     
     initialize();

@@ -1,6 +1,7 @@
-// storage-ui.js
+// VERSION: 0.1.2
+// storage-inspector-ui.js
 
-import { getDataType } from './storage-api.js';
+import { getDataType } from './storage-inspector-api.js';
 
 // --- UI Helper Functions ---
 export function showTooltip(tooltipEl, cardEl, message, targetElement, options = {}) {
@@ -34,7 +35,7 @@ export function hideTooltip(tooltipEl) {
 // --- DOM Rendering Functions ---
 export function updateStatsUI(elements, state, usageInBytes) {
     const { itemCountSpan, usageSpan, usageBarFill } = elements;
-    const itemCount = state.currentStorage.length;
+    const itemCount = state.currentStorage?.length || 0;
     itemCountSpan.textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
     const totalKb = (usageInBytes / 1024).toFixed(2);
     usageSpan.textContent = `${totalKb} KB / ${state.STORAGE_LIMIT_KB} KB`;
